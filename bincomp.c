@@ -35,12 +35,15 @@ int main(int argc, char **argv)
   FILE *f2 = fopen(file2, "r");
   if (!f2)
   {
+    fclose(f1);
     printf("Failed to open %s: %s\n", file2, strerror(errno));
     exit(1);
   }
   FILE *f3 = fopen(file3, "r");
   if (!f3)
   {
+    fclose(f1);
+    fclose(f2);
     printf("Failed to open %s: %s\n", file3, strerror(errno));
     exit(1);
   }
@@ -57,6 +60,9 @@ int main(int argc, char **argv)
       free(buf2);
     if (buf3)
       free(buf3);
+    fclose(f1);
+    fclose(f2);
+    fclose(f3);
     exit(1);
   }
 
@@ -91,22 +97,25 @@ int main(int argc, char **argv)
         int bits_differing = count_bits(buf1[localpos] ^ buf2[localpos]);
         int diff3v1 = count_bits(buf3[localpos] ^ buf1[localpos]);
         int diff3v2 = count_bits(buf3[localpos] ^ buf2[localpos]);
-        printf("0x%010zx blk:%012zu 0x%02x 0x%02x 0x%02x difference: %d bits (vs 3rd file: %d%d)\n", actualpos, block_number, buf1[localpos], buf2[localpos], buf3[localpos], bits_differing, diff3v1, diff3v2);
+        printf("0x%012zx blk:%012zu 0x%02x 0x%02x 0x%02x difference: %d bits (vs 3rd file: %d%d)\n", actualpos, block_number, buf1[localpos], buf2[localpos], buf3[localpos], bits_differing, diff3v1, diff3v2);
       }
     }
     
-
     overallpos += amt1;
     if (amt1 != block_size)
     {
       printf("Compared 0x%zx bytes.\n", overallpos);
       break;
     }
+    fflush(stdout);
   }
 
   
   free(buf1);
   free(buf2);
   free(buf3);
+  fclose(f1);
+  fclose(f2);
+  fclose(f3);
   exit(0);
 }
