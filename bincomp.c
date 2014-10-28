@@ -13,7 +13,7 @@ const size_t offset1 = 262144 * 512; //calculated via  mdadm --examine file1
 const size_t offset2 = 262144 * 512; //calculated via  mdadm --examine file2
 const size_t offset3 = 0;
 
-const size_t block_size = 1024*128;
+const size_t block_size = 1024*1024 * 16;
 
 const int fs_block_size = 4096; //found via tune2fs -l
 
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
       if (buf1[localpos] != buf2[localpos])
       {
         ssize_t actualpos = overallpos + localpos;
-        ssize_t block_number = actualpos / block_size;
+        ssize_t block_number = actualpos / fs_block_size;
         int bits_differing = count_bits(buf1[localpos] ^ buf2[localpos]);
         int diff3v1 = count_bits(buf3[localpos] ^ buf1[localpos]);
         int diff3v2 = count_bits(buf3[localpos] ^ buf2[localpos]);
